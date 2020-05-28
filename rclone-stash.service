@@ -1,0 +1,27 @@
+  GNU nano 2.9.3                                                                                     /etc/systemd/system/rclone-stash.service                                                                                                
+[Unit]
+After=network-online.target
+Requires=rclone-stashcache.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+        --config=/home/owner/.config/rclone/rclone.conf \
+        --allow-other \
+        --umask 002 \
+        --fast-list \
+        --drive-server-side-across-configs \
+        --log-file /home/owner/logs/mnt_stash.log \
+        -v \
+        --rc-addr=localhost:5574 \
+        stash: /home/owner/mnt/stash
+
+
+ExecStop=/bin/fusermount -u /home/owner/mnt/stash
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+
+
