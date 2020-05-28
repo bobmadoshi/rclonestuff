@@ -1,0 +1,27 @@
+  GNU nano 2.9.3                                                                                            /etc/systemd/system/rclone-stashcache.service                                                                                                       
+[Unit]
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+        --config=/home/owner/.config/rclone/rclone.conf \
+        --allow-other \
+        --umask 002 \
+        --fast-list \
+        --tpslimit 5 \
+        --drive-server-side-across-configs \
+        --cache-db-path /home/owner/.cache/rclone/cache-backend \
+        --cache-chunk-path /home/owner/.cache/rclone/cache-backend \
+        --log-file /home/owner/logs/mnt_stashcache.log \
+        -v \
+        --cache-chunk-total-size 2T \
+        --rc-addr=localhost:5573 packcache: /home/owner/mnt/.packcache
+
+ExecStop=/bin/fusermount -u /home/owner/mnt/.packcache
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+
